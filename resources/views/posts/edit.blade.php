@@ -1,49 +1,46 @@
+
 @extends('layouts.main')
-@section('title', 'edit post')
+
+@section('title', 'Post List')
+
 @section('content')
-
-    <div class="container">
-        <h1>Edit Post</h1>
-        <form action="{{ route('posts.update', $post->id) }}" method="post">
-            @csrf
-            @method('PUT')
-
-            <div class="mb-3">
-                <label for="user_id" class="form-label">User ID</label>
-                <select name="user_id" id="user_id" class="form-select">
-                    @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->id }}</option>
+<div class="container mt-4">
+    <h1 class="mb-4">Posts List</h1>
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Published At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($posts as $post)
+                    <tr>
+                        <td>{{ $post->id }}</td>
+                        <td>{{ $post->title }}</td>
+                        <td>{{ $post->published_at }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ route('posts.show', $post->id) }}" class="btn btn-primary me-1">View</a>
+                                @if(auth()->check() && $post->user_id == auth()->user()->id)
+                                <a href="{{ route('posts.edit', $post->id) }}" class="btn btn-secondary me-1">Edit</a>
+                                <form action="{{ route('posts.destroy', $post->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this post?')">Delete</button>
+                                </form>
+                                @endif
+                            </div>
+                        </td>
+                    </tr>
                     @endforeach
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input type="text" name="title" id="title" class="form-control" value="{{ $post->title }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="body" class="form-label">Body</label>
-                <textarea name="body" id="body" cols="30" rows="10" class="form-control">{{ $post->body }}</textarea>
-            </div>
-
-            <div class="mb-3">
-                <label for="slug" class="form-label">Slug</label>
-                <input type="text" name="slug" id="slug" class="form-control" value="{{ $post->slug }}">
-            </div>
-
-            <div class="mb-3">
-                <label for="published_at" class="form-label">Publish At</label>
-                <input type="date" name="published_at" id="published_at" class="form-control"
-                    value="{{ $post->published_at }}">
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox" class="form-check-input" id="enabled" name="enabled"
-                    {{ $post->enabled ? 'checked' : '' }}>
-                <label class="form-check-label" for="enabled">Enabled</label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+                </tbody>
+            </table>
+        </div>
     </div>
+</div>
 @endsection

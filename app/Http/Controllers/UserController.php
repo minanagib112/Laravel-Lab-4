@@ -17,7 +17,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::withCount('posts')->paginate(10);
+        $users = User::withCount('posts')->paginate(6);
         return view('users.index', compact('users'));
     }
     public function create()
@@ -38,7 +38,6 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        event(new Registered($user));
         Auth::login($user);
         // Increment the post_count for the user
         $user->increment('post_count');
@@ -77,8 +76,6 @@ class UserController extends Controller
     {
         $user = User::findOrFail($userId);
 
-        // Log messages for debugging
-        logger("Deleting user {$user->id}");
 
         // Attempt to delete associated posts
         try {
